@@ -26,6 +26,7 @@ makedocs(
     ),
     pages=[
         "Home" => "index.md",
+        "HDF5" => "hdf5.md",
         "Data Compression" => "data_compression.md",
     ],
     doctest = ("fixdoctests" in ARGS) ? :fix : true,
