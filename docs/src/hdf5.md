@@ -51,12 +51,10 @@ Attribute "datatype": "array_of_equalsized_arrays<N,M>{ELEMENT_TYPE}"
 
 Data of the inner arrays is flattened into a single 1-dimensional dataset. An auxiliary dataset stores the cumulative sum of the size of the inner arrays.
 
-...
-
 HDF Attributes:
 
 * "datatype": "array<1>{array<1>{ELEMENT_TYPE}}"
-* "cumsum_length_ds": Name (as string) of the dataset that stores the cumulative sum of the size of the inner arrays.
+* "cumsum_length": HDF5 object reference to the dataset that stores the cumulative sum of the size of the inner vectors.
 
 Note: Instead of referring to the auxiliary dataset by name, a HDF5 dataset reference may be used in the future (still to be evaluated).
 
