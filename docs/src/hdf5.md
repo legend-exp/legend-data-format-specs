@@ -28,23 +28,21 @@ Attribute "datatype": "real", "string", "symbol", ...
 
 Flat n-dimension arrays are stored as n-dimensional datasets
 
-Attribute "datatype": "array<2>{ELEMENT_TYPE}"
+Attribute "datatype": "array<n>{ELEMENT_TYPE}"
 
 
 #### Fixed-sized arrays
 
 ...
 
-Attribute "datatype": fixedsize_array<1>{ELEMENT_TYPE}"
+Attribute "datatype": "fixedsize_array<n>{ELEMENT_TYPE}"
 
 
 #### Arrays of arrays of same size
 
-Nested arrays of dimensionality n, m, ... are stored as flat n+m+n dimensional datasets.
+Nested arrays of dimensionality n, m are stored as flat n+m dimensional datasets.
 
-... attribute to denote dimensionality split ...
-
-Attribute "datatype": "array_of_equalsized_arrays<N,M>{ELEMENT_TYPE}"
+Attribute "datatype": "array_of_equalsized_arrays<n,m>{ELEMENT_TYPE}"
 
 
 #### Vectors of vectors of different size
