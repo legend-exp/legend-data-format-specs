@@ -91,43 +91,94 @@ HDF5 Attributes:
 * "units": e.g. "mm", "ns", "keV"
 
 
-## Example
+## Examples
 
-A table "daqdata" with columns for channel number, event type, energy (online reco) and waveform would be written to an HDF5 file like this:
+A table "daqdata" with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:
 
-* Group "/daqdata"
-    * Attribute "datatype": "table{channel,evttype,daqclk,energy,waveform}"
-
-    * Dataset "/daqdata/channel" (1-dim, `int32`)
-        * Attribute "datatype": "array<1>{real}"
-
-    * Dataset "/daqdata/evttype" (1-dim, `int32`)
-        * Attribute "datatype": "array<1>{enum{evt_real=1,evt_pulser=2,evt_baseline=4}}"
-
-    * Dataset "/daqdata/daqclk" (1-dim, `uint64`)
-        * Attribute "datatype": "array<1>{real}"
-
-    * Dataset "/daqdata/energy" (1-dim, `int32`)
-        * Attribute "datatype": "array<1>{real}"
-
-    * Group "/daqdata/waveform"
-        * Attribute "datatype": "table{t0,dt,values}"
-
-        * Dataset "/daqdata/waveform/t0" (1-dim, `int32`)
-            * Attribute "datatype": "array<1>{real}"
-            * Attribute "units": "ns"
-
-        * Dataset "/daqdata/waveform/dt" (1-dim, `int32`)
-            * Attribute "datatype": "array<1>{real}"
-            * Attribute "units": "ns"
-
-        * Group "/daqdata/waveform/values"
-            * Attribute "datatype": "array<1>{array<1>{real}}"
-
-            * Dataset "/daqdata/waveform/values/flattened_data" (1-dim, `int32`)
-                * Attribute "datatype": "array<1>{real}"
-
-            * Dataset "/daqdata/waveform/values/cumulative_length" (1-dim, `int64`)
-                * Attribute "datatype": "array<1>{real}"
+    GROUP "daqdata" {
+        ATTRIBUTE "datatype" = "table{ch,unixtime,evttype,veto,waveform}"
+        DATASET "ch" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1, 3, 2, 4, ...]
+        }
+        DATASET "unixtime" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1.44061e+09, 1.44061e+09, ...]
+        }
+        DATASET "evttype" {
+            ATTRIBUTE "datatype" = "array<1>{enum{evt_undef=0,evt_real=1,evt_pulser=2,evt_mc=3,evt_baseline=4}}"
+            DATA = [1, 2, 1, 1, ...]
+        }
+        DATASET "veto" {
+            DATA = [1, 1, 0, 0, ...]
+            ATTRIBUTE "datatype" = "array<1>{bool}"
+            DATA = [1, 1, 0, 0, ...]
+        }
+        GROUP "waveform" {
+            ATTRIBUTE "datatype" = "table{t0,dt,values}"
+            DATASET "dt" {
+                ATTRIBUTE "datatype"= "array<1>{real}"
+                ATTRIBUTE "units"= "ns"
+                DATA = [10, 10, 10, ...]
+            }
+            DATASET "t0" {
+                ATTRIBUTE "datatype"= "array<1>{real}"
+                ATTRIBUTE "units"= "ns"
+                DATA = [76420, 76420, 76420, ...]
+            }
+            GROUP "values" {
+                ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
+                DATASET "cumulative_length" {
+                    ATTRIBUTE "datatype" = "array<1>{real}"
+                    DATA = [1000, 2000, 3000, 4000, ...]
+                }
+                DATASET "flattened_data" {
+                    ATTRIBUTE "datatype" = "array<1>{real}"
+                    DATA = [14440, 14442, 14441, 14434, ...]
+                }
+            }
+        }
+    }
 
 The actual numeric types of the datasets will be application-dependent.
+
+A 1-dimensional histogram will be written as
+
+    GROUP "hist_1d" {
+        ATTRIBUTE "datatype" = "struct{binning,weights,isdensity}"
+        GROUP "binning" {
+            ATTRIBUTE "datatype" = "struct{axis_1}"
+            GROUP "axis_1" {
+                ATTRIBUTE "datatype" = "struct{binedges,closedleft}"
+                GROUP "binedges" {
+                    ATTRIBUTE "datatype" = "struct{first,last,step}"
+                    DATASET "first" {
+                        ATTRIBUTE "datatype" = "real"
+                        DATA = 0
+                    }
+                    DATASET "last" {
+                        ATTRIBUTE "datatype" = "real"
+                        DATA = 3000
+                    }
+                    DATASET "step" {
+                        ATTRIBUTE "datatype" = "real"
+                        DATA = 1
+                    }
+                }
+                DATASET "closedleft" {
+                    ATTRIBUTE "datatype" = "bool"
+                    DATA = 1
+                }
+            }
+        }
+        DATASET "isdensity" {
+            ATTRIBUTE "datatype" = "bool"
+            DATA = 0
+        }
+        DATASET "weights" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [...]
+        }
+    }
+
+Multi-dimensional histograms will have groups "axis_2", etc., with a multi-dimensional array as the value of dataset "weights".
