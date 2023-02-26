@@ -2,14 +2,11 @@
 
 In addition to compression features provided by standard data formats (HDF5, etc.), LEGEND data uses some custom data compression.
 
-In the interest of long-term data accessibility and to ensure compliance with FAIR data principles, use of custom data compression methods has to be limited to a minimum number of methods and use cases. Long-term use is only acceptable if:
+In the interest of long-term data accessibility and to ensure compliance with [FAIR data principles](https://www.nature.com/articles/sdata201618), use of custom data compression methods has to be limited to a minimum number of methods and use cases. Long-term use is only acceptable if:
 
 *  The custom compression significantly outperforms standard compression methods in compression ratio and/or (de-)compression speed for important use cases.
-
 * A complete formal description of the algorithms exists and is made publicly available under a license that allows for independent third-party implementations.
-
 * Verified implementations exist in a least two different programming languages, at least one of which has been implemented independently from the formal description of the algorithm and at least one of which is made publicly available under an open-source license.
-
 
 ## Lossless compression of integer-valued waveform vectors
 
@@ -17,15 +14,28 @@ As detector waveforms have specific shapes, custom compression algorithms optimi
 
 Currently, we use the following custom integer-waveform compression algorithms:
 
-* *radware-sigcompress* v1.0
+| Algorithm                          | Identifier (`codec` attribute) |
+| ---------------------------------- | ------------------------------ |
+| [radware-sigcompress v1.0](@ref)   | `radware_sigcompress`          |
+| [ULEB128 ZigZag Differences](@ref) | `uleb128_zigzag_diff`          |
 
 Other compression algorithms are being developed, tested and evaluated.
 
 !!! note
     The algorithm(s) in use are still subject to change, long-term data compatibility is not guaranteed at this point.
 
+### ULEB128 ZigZag Differences
 
-### radware-sigcompress
+Efficient encoding of FADC waveform data can be achieved with the following algorithm:
+
+1. Compute the waveform derivative (differences between adjacent samples). Prepend the result with the first value of the original waveform
+1. Map to positive values (including zero) via ZigZag encoding[^1]
+1. Compute a binary variable-length representation of each value via Unsigned Little Endian Base-128 (7-bit) encoding[^2].
+
+[^1]: <https://wikipedia.org/wiki/Variable-length_quantity#Zigzag_encoding>
+[^2]: <https://wikipedia.org/wiki/LEB128#Unsigned_LEB128>
+
+### radware-sigcompress v1.0
 
 There is no formal description of the *radware-sigcompress* algorithm yet, so the C-code of the original implementation (`sigcompress.c`) will serve as the reference for now:
 
