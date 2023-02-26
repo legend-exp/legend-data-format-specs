@@ -1,99 +1,196 @@
-# HDF5 File Format [Incomplete]
+# HDF5 File Format
 
-HDF5 is used as the primary binary data format in LEGEND.
+[HDF5](https://www.hdfgroup.org/solutions/hdf5) is used as the primary binary data format in LEGEND.
 
 The following describes a mapping between the abstract data model and HDF5. This specifies the structure of the HDF5 implicitly, but precisely, for any data that conforms to the data model. The mapping purposefully uses only common and basic HDF5 features, to ensure it can be easily and reliably implemented in multiple programming languages.
 
-
 ## HDF5 datasets, groups and attributes
 
-Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2-dimensional dataset may represent a matrix or a vector of same-sized vectors). To make the HDF5 files self-documenting, the HDF5 attribute "datatype" is used to indicate the type semantics of datasets and groups.
-
+Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2-dimensional dataset may represent a matrix or a vector of same-sized vectors). To make the HDF5 files self-documenting, the HDF5 attribute `datatype` is used to indicate the type semantics of datasets and groups.
 
 ## Abstract data model representation
 
+!!! note "Quick reference"
+    | Data type | `datatype` attribute |
+    | ---       | ---       |
+    | Scalar | `real`, `string`, `symbol`, `bool`, ... |
+    | Flat ``n``-dimensional array | `array<n>{ELEMENT_DTYPE}` |
+    | Fixed-sized ``n``-dimensional array | `fixedsize_array<n>{ELEMENT_DTYPE}` |
+    |``n``-dimensional array of ``m``-dimensional arrays of the same size | `array_of_equalsized_arrays<n,m>{ELEMENT_DTYPE}` |
+    | Vector of vectors of different size | `array<1>{array<1>{ELEMENT_DTYPE}}` |
+    | Struct | `struct{FIELDNAME_1,FIELDNAME_2,...}` |
+    | Table | `table{COLNAME_1,COLNAME_2,...}` |
+    | Enum | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}` |
+
 The abstract data model is mapped as follows:
 
+### Scalars
 
-### Scalar values
+Single scalar values are stored as 0-dimensional HDF5 datasets.
 
-Single scalar values are stored as 0-dimensional datasets
-
-Attribute "datatype": "real", "string", "symbol", ...
-
+    DATASET "scalar" {
+        ATTRIBUTE "datatype" = "real"
+        DATA = 3.14
+    }
 
 ### Arrays
 
+Collections of values. The `datatype` attribute will always contain `array`.
+
 #### Flat arrays
 
-Flat n-dimension arrays are stored as n-dimensional datasets
+Flat ``n``-dimensional arrays are stored as ``n``-dimensional HDF5 datasets.
 
-Attribute "datatype": "array<n>{ELEMENT_TYPE}"
-
+    DATASET "unixtime" {
+        ATTRIBUTE "datatype" = "array<1>{real}"
+        ATTRIBUTE "units" = "ns"
+        DATA = [1.44061e+09, 1.44061e+09, ...]
+    }
 
 #### Fixed-sized arrays
 
-...
-
-Attribute "datatype": "fixedsize_array<n>{ELEMENT_TYPE}"
-
+!!! warning
+    Undocumented
 
 #### Arrays of arrays of same size
 
-Nested arrays of dimensionality n, m are stored as flat n+m dimensional datasets.
+``n-``dimensional arrays of ``m``-dimensional arrays of the same size are stored as flat ``n+m`` dimensional datasets.
 
-Attribute "datatype": "array_of_equalsized_arrays<n,m>{ELEMENT_TYPE}"
-
+    DATASET "waveform_values" {
+        ATTRIBUTE "datatype" = "array<1,1>{real}"
+        DATA = [[13712, 13712, 13683, ..., 15400]
+                [13072, 13072, 12992, ..., 18806]
+                ...
+                [16918, 16918, 16962, ..., 18933]]
+    }
 
 #### Vectors of vectors of different size
 
-A Vector of vectors is stored as a group that contains two datasets:
+A vector-of-vectors is stored as an HDF5 group that contains two datasets:
 
-* A 1-dimensional dataset "flattened_data" that stores the concatenation of all vectors into a single vector.
-* A 1-dimensional dataset "cumulative_length" that stores the cumulative sum of the length of all vectors.
+* A 1-dimensional dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
+* A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors.
 
-HDF5 Attributes of the group:
+The two datasets in the group also have `datatype` (and possibly `units`) attributes that match their content.
 
-* "datatype": "array<1>{array<1>{ELEMENT_TYPE}}"
-
-The two datasets in the group also have "datatype" (and possibly "units") attributes that match their content.
-
+    GROUP "vector_of_vectors" {
+        ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
+        DATASET "flattened_data" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1, 4, 3, ...]
+        }
+        DATASET "cumulative_length" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [3, 10, 34, ...]
+        }
+    }
 
 ### Structs
 
 Structs are stored as HDF5 groups. Fields that are structs themselves are stored as sub-groups, scalars and arrays as datasets. Groups and datasets in the group are named after the fields of the struct.
 
-HDF5 Attributes:
-
-* "datatype": "struct{FIELDNAME_1,FIELDNAME_2,...}"
-
+    GROUP "struct" {
+        ATTRIBUTE "datatype" = "struct{array1,flag2,obj3}
+        DATASET "array1" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [5, 23, 4, ...]
+        }
+        DATASET "flag2" {
+            ATTRIBUTE "datatype" = "bool"
+            DATA = 0
+        }
+        GROUP "obj3" {
+            ATTRIBUTE "datatype" = "struct{obj2}"
+            ...
+        }
+    }
 
 ### Tables
 
-A Table are stored are group of datasets, each representing a column of the table.
+A table is struct where all the fields (also called "columns") have the same length. It is stored as a group of datasets, each representing a column of the table.
 
-HDF5 Attributes:
-
-* "datatype": "table{COLNAME_1,COLNAME_2,...}"
-
+    GROUP "waveform" {
+        ATTRIBUTE "datatype" = "table{t0,dt,values}"
+        DATASET "dt" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [10, 10, 10, ...]
+        }
+        DATASET "t0" {
+            ATTRIBUTE "datatype"= "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [76420, 76420, 76420, ...]
+        }
+        GROUP "values" {
+            ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
+            DATASET "cumulative_length" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [1000, 2000, 3000, 4000, ...]
+            }
+            DATASET "flattened_data" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [14440, 14442, 14441, 14434, ...]
+            }
+        }
+    }
 
 ### Enums
 
-Enum values are stores as integer values, but with the "datatype" attribute: "enum{NAME=INT_VALUE,...}". So a vector of enum values will have a "datatype" attribute like "array<N>{enum{NAME=INT_VALUE,...}}""
+Enum values are stored as integer values, but with the `datatype` attribute: `enum{NAME=INT_VALUE,...}`
 
+    DATASET "evttype" {
+        ATTRIBUTE "datatype" = "array<1>{enum{evt_real=1,evt_pulser=2,evt_baseline=4}}"
+        DATA = [1, 2, 1, 1, ...]
+    }
 
 ### Values with physical units
 
-For values with physical units, the dataset only contains the numerical values. The attribute "units" stores the unit information. The attribute value is the string representation of the common scientific notation for the unit. Unicode must not be used.
+For values with physical units, the dataset only contains the numerical values. The attribute `units` stores the unit information. Its value is the string representation of the common scientific notation for the unit. Unicode must not be used.
 
-HDF5 Attributes:
+    DATASET "energy" {
+        ATTRIBUTE "datatype" = "array<1>{real}"
+        ATTRIBUTE "units" = "keV"
+        DATA = {2453.25, 234.34, 2039.22, ...]
+    }
 
-* "units": e.g. "mm", "ns", "keV"
+## Waveform tables
 
+Waveform tables are regular [Tables](@ref) with three columns (`table{t0,dt,values}`):
 
-## Examples
+* `t0`: the waveform time offsets (ralative to a certain global reference), optionally with units
+* `dt`: the waveform sampling periods, optionally with units
+* `values`: the waveform values. May be [Arrays of arrays of same size](@ref), [Vectors of vectors of different size](@ref), etc.
 
-A table "daqdata" with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:
+Example:
+
+    GROUP "waveform" {
+        ATTRIBUTE "datatype" = "table{t0,dt,values}"
+        DATASET "dt" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [10, 10, 10, ...]
+        }
+        DATASET "t0" {
+            ATTRIBUTE "datatype"= "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [76420, 76420, 76420, ...]
+        }
+        GROUP "values" {
+            ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
+            DATASET "cumulative_length" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [1000, 2000, 3000, 4000, ...]
+            }
+            DATASET "flattened_data" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [14440, 14442, 14441, 14434, ...]
+            }
+        }
+    }
+
+## DAQ data example
+
+A table `daqdata` with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:
 
     GROUP "daqdata" {
         ATTRIBUTE "datatype" = "table{ch,unixtime,evttype,veto,waveform}"
@@ -142,6 +239,8 @@ A table "daqdata" with columns for channel number, unix-time, event type, veto a
 
 The actual numeric types of the datasets will be application-dependent.
 
+## Histograms
+
 A 1-dimensional histogram will be written as
 
     GROUP "hist_1d" {
@@ -181,4 +280,4 @@ A 1-dimensional histogram will be written as
         }
     }
 
-Multi-dimensional histograms will have groups "axis_2", etc., with a multi-dimensional array as the value of dataset "weights".
+Multi-dimensional histograms will have groups `axis_2`, etc., with a multi-dimensional array as the value of dataset `weights`.

@@ -2,7 +2,7 @@
 
 ## General DAQ structure
 
-DAQ data is represented by a table, each row represents a DAQ event on a single (physical or logical) input channel. Event building will happen at a higher data level.
+(Data Acquisition) DAQ data is represented by a table, each row represents a DAQ event on a single (physical or logical) input channel. Event building will happen at a higher data level.
 
 The detailed structure of DAQ data will depend on the DAQ system and experimental setup. However, fields like these may become mandatory for all DAQs:
 
@@ -12,8 +12,8 @@ The detailed structure of DAQ data will depend on the DAQ system and experimenta
 
 A DAQ system with waveform digitization will provide columns like
 
-* `waveform_lf`: array<1>{waveform}, see below
-* `waveform_hf`: array<1>{waveform}, see below
+* `waveform_lf`: `array<1>{waveform}` (see [Waveform vectors](@ref))
+* `waveform_hf`: `array<1>{waveform}`
 
 If the DAQ performs an internal pulse-shape analysis (digital or analog), energy reconstruction and other columns may be available, e.g.:
 
@@ -30,7 +30,6 @@ Legacy data that does not separate low-level DAQ data and event building will al
 
 * `evtno`: `array<1>{real}`
 
-
 ## Waveform vectors
 
 Waveform data as be stored either directly in compressed form. Uncompressed waveform data is stored as a `table{t0,dt,values}`:
@@ -41,7 +40,6 @@ Waveform data as be stored either directly in compressed form. Uncompressed wave
 * or `encvalues`: `table{bytes,... codec information ...}`
 
 * `encvalues`: `table{bytes,... codec information ...}`
-* 
 * `bytes`: `array<1>{array<1>{real}}`
 * `some_codec_information`: ...
 

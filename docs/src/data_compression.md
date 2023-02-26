@@ -17,16 +17,17 @@ As detector waveforms have specific shapes, custom compression algorithms optimi
 
 Currently, we use the following custom integer-waveform compression algorithms:
 
-* radware-sigcompress v1.0
+* *radware-sigcompress* v1.0
 
 Other compression algorithms are being developed, tested and evaluated.
 
-Note: The algorithm(s) in use are still subject to change, long-term data compatibility is not guaranteed at this point.
+!!! note
+    The algorithm(s) in use are still subject to change, long-term data compatibility is not guaranteed at this point.
 
 
 ### radware-sigcompress
 
-There is no formal description of the radware-sigcompress algorithm yet, so the C-code of the original implementation ("sigcompress.c") will serve as the reference for now:
+There is no formal description of the *radware-sigcompress* algorithm yet, so the C-code of the original implementation (`sigcompress.c`) will serve as the reference for now:
 
 ```C
 // radware-sigcompress, v1.0
