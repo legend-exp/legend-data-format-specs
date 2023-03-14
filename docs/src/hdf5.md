@@ -11,17 +11,17 @@ Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2
 ## Basic types
 
 !!! note "Quick reference"
-    | Data type                                                            | `datatype` attribute                             |
-    | ---                                                                  | ---                                              |
-    | Scalar                                                               | `real`, `string`, `symbol`, `bool`, ...          |
-    | Flat ``n``-dimensional array                                         | `array<n>{ELTYPE}`                        |
-    | Fixed-sized ``n``-dimensional array                                  | `fixedsize_array<n>{ELTYPE}`              |
-    | ``n``-dimensional array of ``m``-dimensional arrays of the same size | `array_of_equalsized_arrays<n,m>{ELTYPE}` |
-    | Vector of vectors of different size                                  | `array<1>{array<1>{ELTYPE}}`              |
-    | Struct                                                               | `struct{FIELDNAME_1,FIELDNAME_2,...}`            |
-    | Table                                                                | `table{COLNAME_1,COLNAME_2,...}`                 |
-    | Enum                                                                 | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}`    |
-    | Encoded vector of vectors of different size                          | `array<1>{encoded_array<1>{ELTYPE}}`      |
+    | Data type                                                            | `datatype` attribute                              |
+    | -------------------------------------------------------------------- | ------------------------------------------------- |
+    | Scalar                                                               | `real`, `string`, `symbol`, `bool`, ...           |
+    | Flat ``n``-dimensional array                                         | `array<n>{ELTYPE}`                                |
+    | Fixed-sized ``n``-dimensional array                                  | `fixedsize_array<n>{ELTYPE}`                      |
+    | ``n``-dimensional array of ``m``-dimensional arrays of the same size | `array_of_equalsized_arrays<n,m>{ELTYPE}`         |
+    | Vector of vectors of different size                                  | `array<1>{array<1>{ELTYPE}}`                      |
+    | Struct                                                               | `struct{FIELDNAME_1,FIELDNAME_2,...}`             |
+    | Table                                                                | `table{COLNAME_1,COLNAME_2,...}`                  |
+    | Enum                                                                 | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}`     |
+    | Encoded vector of vectors of different size                          | `array<1>{encoded_array<1>{ELTYPE}}`              |
     | Encoded array of arrays of the same size                             | `array_of_equalsized_encoded_arrays<n,m>{ELTYPE}` |
 
 The abstract data model is mapped as follows:
@@ -159,18 +159,13 @@ Specialized structures should exist to represent encoded data. An important appl
 
 ### Encoded [Array of equal-sized arrays](@ref)
 
-!!! warning
-    Undocumented
-
-### Encoded [Vector of vectors](@ref)
-
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
-* `decoded_size`: the lengths of the original (decoded) arrays
+* `decoded_size`: 1-dimensional dataset that stores the lengths of the original (decoded) arrays
 
 Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1>{real}}` of bytes.
 
     GROUP "waveform_values" {
-        ATTRIBUTE "datatype" = "array<1>{encoded_array<1>{real}}"
+        ATTRIBUTE "datatype" = "array_of_encoded_equalsized_arrays<1,1>{real}"
         GROUP "encoded_data" {
             ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
             DATASET "cumulative_length" {
@@ -183,44 +178,14 @@ Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1
             }
         }
         DATASET "decoded_size" {
-            ATTRIBUTE "datatype" = "array<1>{real}"
-            DATA = [...]
+            ATTRIBUTE "datatype" = "real"
+            DATA = ...
         }
 
-## Waveform vectors
+### Encoded [Vector of vectors](@ref)
 
-Waveform vectors are regular [Table](@ref)s with three columns (`table{t0,dt,values}`):
-
-* `t0`: the waveform time offsets (ralative to a certain global reference), optionally with units
-* `dt`: the waveform sampling periods, optionally with units
-* `values`: the waveform values. May be [Array of equal-sized arrays](@ref), [Vector of vectors](@ref), etc. `t0` and `dt` must have one dimension (the last) less than `values`.
-
-Example:
-
-    GROUP "waveform" {
-        ATTRIBUTE "datatype" = "table{t0,dt,values}"
-        DATASET "dt" {
-            ATTRIBUTE "datatype" = "array<1>{real}"
-            ATTRIBUTE "units" = "ns"
-            DATA = [10, 10, 10, ...]
-        }
-        DATASET "t0" {
-            ATTRIBUTE "datatype"= "array<1>{real}"
-            ATTRIBUTE "units" = "ns"
-            DATA = [76420, 76420, 76420, ...]
-        }
-        GROUP "values" {
-            ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
-            DATASET "cumulative_length" {
-                ATTRIBUTE "datatype" = "array<1>{real}"
-                DATA = [1000, 2000, 3000, 4000, ...]
-            }
-            DATASET "flattened_data" {
-                ATTRIBUTE "datatype" = "array<1>{real}"
-                DATA = [14440, 14442, 14441, 14434, ...]
-            }
-        }
-    }
+* `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
+* `decoded_size`: 0-dimensional (i.e. scalar) dataset that stores the length of the original (decoded) arrays
 
 ## Histograms
 
@@ -264,54 +229,3 @@ A 1-dimensional histogram will be written as
     }
 
 Multi-dimensional histograms will have groups `axis_2`, etc., with a multi-dimensional array as the value of dataset `weights`.
-
-## DAQ data example
-
-A table `daqdata` with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:
-
-    GROUP "daqdata" {
-        ATTRIBUTE "datatype" = "table{ch,unixtime,evttype,veto,waveform}"
-        DATASET "ch" {
-            ATTRIBUTE "datatype" = "array<1>{real}"
-            DATA = [1, 3, 2, 4, ...]
-        }
-        DATASET "unixtime" {
-            ATTRIBUTE "datatype" = "array<1>{real}"
-            DATA = [1.44061e+09, 1.44061e+09, ...]
-        }
-        DATASET "evttype" {
-            ATTRIBUTE "datatype" = "array<1>{enum{evt_undef=0,evt_real=1,evt_pulser=2,evt_mc=3,evt_baseline=4}}"
-            DATA = [1, 2, 1, 1, ...]
-        }
-        DATASET "veto" {
-            DATA = [1, 1, 0, 0, ...]
-            ATTRIBUTE "datatype" = "array<1>{bool}"
-            DATA = [1, 1, 0, 0, ...]
-        }
-        GROUP "waveform" {
-            ATTRIBUTE "datatype" = "table{t0,dt,values}"
-            DATASET "dt" {
-                ATTRIBUTE "datatype"= "array<1>{real}"
-                ATTRIBUTE "units"= "ns"
-                DATA = [10, 10, 10, ...]
-            }
-            DATASET "t0" {
-                ATTRIBUTE "datatype"= "array<1>{real}"
-                ATTRIBUTE "units"= "ns"
-                DATA = [76420, 76420, 76420, ...]
-            }
-            GROUP "values" {
-                ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
-                DATASET "cumulative_length" {
-                    ATTRIBUTE "datatype" = "array<1>{real}"
-                    DATA = [1000, 2000, 3000, 4000, ...]
-                }
-                DATASET "flattened_data" {
-                    ATTRIBUTE "datatype" = "array<1>{real}"
-                    DATA = [14440, 14442, 14441, 14434, ...]
-                }
-            }
-        }
-    }
-
-The actual numeric types of the datasets will be application-dependent.
