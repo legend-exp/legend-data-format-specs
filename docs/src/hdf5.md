@@ -155,9 +155,11 @@ For values with physical units, the dataset only contains the numerical values. 
 
 ## Encoded arrays
 
-Specialized structures should exist to represent encoded data. An important application is for lossless compression of waveform vectors (see [Data Compression](@ref).
+Specialized structures should exist to represent encoded data. An important application is for lossless compression of waveform vectors (see [Data Compression](@ref)). All HDF5 objects representing encoded arrays must carry (in addition to the usual `datatype`) a `codec` string attribute holding the encoder algorithm identifier (a list can be found in [Data Compression](@ref)) in order to be decoded. Some decoders might require additional mandatory attributes.
 
 ### Encoded [Array of equal-sized arrays](@ref)
+
+An encoded array of equal-sized arrays is stored as an HDF5 group that contains two datasets:
 
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
 * `decoded_size`: 1-dimensional dataset that stores the lengths of the original (decoded) arrays
@@ -166,6 +168,8 @@ Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1
 
     GROUP "waveform_values" {
         ATTRIBUTE "datatype" = "array_of_encoded_equalsized_arrays<1,1>{real}"
+        ATTRIBUTE "codec" = "radware_sigcompress"
+        ATTRIBUTE "codec_shift" = -32768
         GROUP "encoded_data" {
             ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
             DATASET "cumulative_length" {
@@ -183,6 +187,8 @@ Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1
         }
 
 ### Encoded [Vector of vectors](@ref)
+
+An encoded vector of vectors of unqual sizes is stored as an HDF5 group that contains two datasets:
 
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
 * `decoded_size`: 0-dimensional (i.e. scalar) dataset that stores the length of the original (decoded) arrays
