@@ -1,4 +1,4 @@
-# LEGEND Data Format Specs [DRAFT]
+# LEGEND Data Format Specs
 
 ## General considerations
 

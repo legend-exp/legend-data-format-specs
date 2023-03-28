@@ -1,30 +1,19 @@
 # Use
 #
-#     DOCUMENTER_DEBUG=true julia --color=yes make.jl local [fixdoctests]
+#     DOCUMENTER_DEBUG=true julia --color=yes make.jl local [nonstrict] [fixdoctests]
 #
 # for local builds.
 
-import Pkg
-
-try
-    using Documenter
-catch err
-    if err isa ArgumentError
-        Pkg.pkg"instantiate"
-        using Documenter
-    else
-        rethrow()
-    end
-end
+using Documenter
 
 makedocs(
     sitename = "LEGEND Data Format Specifications",
     modules = Module[],
     format = Documenter.HTML(
-        prettyurls = ("prettyurls" in ARGS),
+        prettyurls = !("local" in ARGS),
         canonical = "https://legend-exp.github.io/legend-data-format-specs/stable/"
     ),
-    pages=[
+    pages = [
         "Home" => "index.md",
         "HDF5" => "hdf5.md",
         "Data Compression" => "data_compression.md",
@@ -35,5 +24,6 @@ makedocs(
 
 deploydocs(
     repo = "github.com/legend-exp/legend-data-format-specs.git",
-    forcepush = true
+    forcepush = true,
+    push_preview = true,
 )
