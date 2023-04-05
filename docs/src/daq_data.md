@@ -1,57 +1,97 @@
 # Low-level DAQ Data Structure
 
-## General DAQ structure
-
-DAQ data is represented by a table, each row represents a DAQ event on a single (physical or logical) input channel. Event building will happen at a higher data level.
-
-The detailed structure of DAQ data will depend on the DAQ system and experimental setup. However, fields like these may become mandatory for all DAQs:
-
-* `ch`: `array<1>{real}`
-* `evttype`: `array<1>{enum{evt_undef=0,evt_real=1,evt_pulser=2,evt_mc=3,evt_baseline=4}}`
-* `daqevtno`: `array<1>{real}`
-
-A DAQ system with waveform digitization will provide columns like
-
-* `waveform_lf`: array<1>{waveform}, see below
-* `waveform_hf`: array<1>{waveform}, see below
-
-If the DAQ performs an internal pulse-shape analysis (digital or analog), energy reconstruction and other columns may be available, e.g.:
-
-* `psa_energy`: `array<1>{real}`
-* `psa_trise`: `array<1>{real}`
-
-Other DAQ and setup-specific columns will often be present, e.g.
-
-* `muveto`: `array<1>{real}`
-
-The collaboration will decide on a list of recommended columns names, to ensure columns with same semantics will have the same name, independent of DAQ/setup.
-
-Legacy data that does not separate low-level DAQ data and event building will also include a column
-
-* `evtno`: `array<1>{real}`
-
+DAQ data is represented by a table, each row represents a DAQ event on a single (physical or logical) input channel. Event building will happen at a higher data level. The detailed structure of DAQ data will depend on the DAQ system and experimental setup.
 
 ## Waveform vectors
 
-Waveform data as be stored either directly in compressed form. Uncompressed waveform data is stored as a `table{t0,dt,values}`:
+Waveform vectors are regular [Table](@ref)s with three columns (`table{t0,dt,values}`):
 
-* `t0`: `array<1>{real}`
-* `dt`: `array<1>{real}`
-* Either `values`: `array<1>{array<1>{real}}` or `array_of_equalsized_arrays<1,1>{real}`
-* or `encvalues`: `table{bytes,... codec information ...}`
+* `t0`: the waveform time offsets (ralative to a certain global reference), optionally with units
+* `dt`: the waveform sampling periods, optionally with units
+* `values`: the waveform values. May be [Array of equal-sized arrays](@ref), [Vector of vectors](@ref), etc. `t0` and `dt` must have one dimension (the last) less than `values`.
 
-* `encvalues`: `table{bytes,... codec information ...}`
-* 
-* `bytes`: `array<1>{array<1>{real}}`
-* `some_codec_information`: ...
+Example:
 
-Compressed waveform data is stored as a `table{t0,dt,encvalues}`:
+    GROUP "waveform" {
+        ATTRIBUTE "datatype" = "table{t0,dt,values}"
+        DATASET "dt" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [10, 10, 10, ...]
+        }
+        DATASET "t0" {
+            ATTRIBUTE "datatype"= "array<1>{real}"
+            ATTRIBUTE "units" = "ns"
+            DATA = [76420, 76420, 76420, ...]
+        }
+        GROUP "values" {
+            ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
+            DATASET "cumulative_length" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [1000, 2000, 3000, 4000, ...]
+            }
+            DATASET "flattened_data" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [14440, 14442, 14441, 14434, ...]
+            }
+        }
+    }
 
-* `t0`: `array<1>{real}`
-* `dt`: `array<1>{real}`
-* `encvalues`: `table{bytes,... codec information ...}`
 
-The column `encvalues` has the structure
+## Generic DAQ data example
 
-* `bytes`: `array<1>{array<1>{real}}`
-* `some_codec_information`: ...
+A table `daqdata` with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:
+
+    GROUP "daqdata" {
+        ATTRIBUTE "datatype" = "table{ch,unixtime,evttype,veto,waveform}"
+        DATASET "ch" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1, 3, 2, 4, ...]
+        }
+        DATASET "unixtime" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1.44061e+09, 1.44061e+09, ...]
+        }
+        DATASET "evttype" {
+            ATTRIBUTE "datatype" = "array<1>{enum{evt_undef=0,evt_real=1,evt_pulser=2,evt_mc=3,evt_baseline=4}}"
+            DATA = [1, 2, 1, 1, ...]
+        }
+        DATASET "veto" {
+            DATA = [1, 1, 0, 0, ...]
+            ATTRIBUTE "datatype" = "array<1>{bool}"
+            DATA = [1, 1, 0, 0, ...]
+        }
+        GROUP "waveform" {
+            ATTRIBUTE "datatype" = "table{t0,dt,values}"
+            DATASET "dt" {
+                ATTRIBUTE "datatype"= "array<1>{real}"
+                ATTRIBUTE "units"= "ns"
+                DATA = [10, 10, 10, ...]
+            }
+            DATASET "t0" {
+                ATTRIBUTE "datatype"= "array<1>{real}"
+                ATTRIBUTE "units"= "ns"
+                DATA = [76420, 76420, 76420, ...]
+            }
+            GROUP "values" {
+                ATTRIBUTE "datatype"= "array<1>{array<1>{real}}"
+                DATASET "cumulative_length" {
+                    ATTRIBUTE "datatype" = "array<1>{real}"
+                    DATA = [1000, 2000, 3000, 4000, ...]
+                }
+                DATASET "flattened_data" {
+                    ATTRIBUTE "datatype" = "array<1>{real}"
+                    DATA = [14440, 14442, 14441, 14434, ...]
+                }
+            }
+        }
+    }
+
+The actual numeric types of the datasets will be application-dependent.
+
+
+## LEGEND FlashCam DAQ data read out by Orca
+
+Full format specification of the *raw* tier data.
+
+**Coming Soon...**
