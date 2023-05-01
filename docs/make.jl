@@ -16,6 +16,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "HDF5" => "hdf5.md",
+        "Metadata" => "metadata.md",
         "DAQ Data" => "daq_data.md",
         "Data Compression" => "data_compression.md",
     ],
