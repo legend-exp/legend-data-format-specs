@@ -1,7 +1,5 @@
 # LEGEND Data Format Specifications
 
-```@contents
-```
 ## General considerations
 
 In the interest of long-term data accessibility and to ensure compliance with [FAIR data principles](https://www.nature.com/articles/sdata201618),

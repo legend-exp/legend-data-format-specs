@@ -1,5 +1,10 @@
 # HDF5 File Format
 
+```@contents
+Pages = ["hdf5.md"]
+Depth = 5
+```
+
 [HDF5](https://www.hdfgroup.org/solutions/hdf5) is used as the primary binary data format in LEGEND.
 
 The following describes a mapping between the abstract data model and HDF5. This specifies the structure of the HDF5 implicitly, but precisely, for any data that conforms to the data model. The mapping purposefully uses only common and basic HDF5 features, to ensure it can be easily and reliably implemented in multiple programming languages.
