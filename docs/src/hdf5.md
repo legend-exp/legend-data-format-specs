@@ -22,7 +22,7 @@ Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2
     | Flat ``n``-dimensional array                                         | `array<n>{ELTYPE}`                                |
     | Fixed-sized ``n``-dimensional array                                  | `fixedsize_array<n>{ELTYPE}`                      |
     | ``n``-dimensional array of ``m``-dimensional arrays of the same size | `array_of_equalsized_arrays<n,m>{ELTYPE}`         |
-    | Vector of vectors of different size                                  | `array<1>{array<1>{ELTYPE}}`                      |
+    | Vector of vectors of different size                                  | `array<1>{ARRAY-LIKE_DATATYPE}`                   |
     | Struct                                                               | `struct{FIELDNAME_1,FIELDNAME_2,...}`             |
     | Table                                                                | `table{COLNAME_1,COLNAME_2,...}`                  |
     | Enum                                                                 | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}`     |
@@ -73,16 +73,16 @@ Flat ``n``-dimensional arrays are stored as ``n``-dimensional HDF5 datasets.
 
 A vector of vectors of unqual sizes is stored as an HDF5 group that contains two datasets:
 
-* A 1-dimensional dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
-* A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors.
+* An array-like dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
+* A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors (refers to axis 0 in `flattened_data`).
 
 The two datasets in the group also have `datatype` (and possibly `units`) attributes that match their content.
 
     GROUP "vector_of_vectors" {
-        ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
+        ATTRIBUTE "datatype" = "array<1>{ARRAY-LIKE_DATATYPE}"
         DATASET "flattened_data" {
-            ATTRIBUTE "datatype" = "array<1>{real}"
-            DATA = [1, 4, 3, ...]
+            ATTRIBUTE "datatype" = "ARRAY-LIKE_DATATYPE"
+            DATA = ...
         }
         DATASET "cumulative_length" {
             ATTRIBUTE "datatype" = "array<1>{real}"
