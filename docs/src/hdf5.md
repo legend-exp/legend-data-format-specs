@@ -73,7 +73,7 @@ Flat ``n``-dimensional arrays are stored as ``n``-dimensional HDF5 datasets.
 
 A vector of vectors of unqual sizes is stored as an HDF5 group that contains two datasets:
 
-* An array-like dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
+* An array-like dataset `flattened_data` that stores the concatenation of all vectors into a single vector. Can be `*array<n>{...}`, `table{...}`, etc.
 * A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors (refers to axis 0 in `flattened_data`).
 
 The two datasets in the group also have `datatype` (and possibly `units`) attributes that match their content.
