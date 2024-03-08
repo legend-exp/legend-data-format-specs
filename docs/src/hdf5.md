@@ -76,7 +76,8 @@ A vector of vectors of unqual sizes is stored as an HDF5 group that contains two
 * A 1-dimensional dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
 * A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors.
 
-The two datasets in the group also have `datatype` (and possibly `units`) attributes that match their content.
+The two datasets in the group also have `datatype` (and possibly `units`) attributes that match their content. For a
+vector-of-vectors-of-reals, the HDF5 structure is
 
     GROUP "vector_of_vectors" {
         ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
@@ -89,6 +90,8 @@ The two datasets in the group also have `datatype` (and possibly `units`) attrib
             DATA = [3, 10, 34, ...]
         }
     }
+
+Vectors-of-vectors may be nested to create vectors-of-vectors-of-vectors and so on. So for a vector-of-vectors-of-vectors, the `datatype` attribute of the HDF5 group will be `array<1>{array<1>{array<1>{real}}}`, and `flattened_data` will iself be a vector-of-vectors HDF5 group with the `datatype` attribute `array<1>{array<1>{real}}`. Deeper nesting is allowed.
 
 ### Struct
 
