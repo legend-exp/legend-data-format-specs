@@ -27,7 +27,7 @@ Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2
     | Table                                                                | `table{COLNAME_1,COLNAME_2,...}`                  |
     | Enum                                                                 | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}`     |
     | Encoded vector of vectors of different size                          | `array<1>{encoded_array<1>{ELTYPE}}`              |
-    | Encoded array of arrays of the same size                             | `array_of_equalsized_encoded_arrays<n,m>{ELTYPE}` |
+    | Encoded array of arrays of the same size                             | `array_of_encoded_equalsized_arrays<n,m>{ELTYPE}` |
 
 The abstract data model is mapped as follows:
 
