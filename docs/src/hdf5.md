@@ -250,3 +250,8 @@ Multi-dimensional histograms will have groups `axis_2`, etc., with a multi-dimen
 As an alternative to the range objects mentioned above, a simple 1-dimensional array of monotonically increasing bin edges can be used as `binedges` for an axis, to represent a variable binning.
 
 Physical units describing the axes should be, if necessary, attached to the `binedges` object of each axis.
+
+
+## Detector IDs
+
+LEGEND detector IDs use datatype `detectorid`. They should be stored using the 32-bit integer encoding specified in [Detector ID encoding](@ref), but may also be stored as strings.

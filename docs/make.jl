@@ -19,6 +19,7 @@ makedocs(
         "Metadata" => "metadata.md",
         "DAQ Data" => "daq_data.md",
         "Data Compression" => "data_compression.md",
+        "Detector IDs" => "detector_ids.md",
     ],
     doctest = ("fixdoctests" in ARGS) ? :fix : true,
 )
