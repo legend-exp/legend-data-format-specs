@@ -257,12 +257,8 @@ A view is stored as an HDF5 link to another HDF5 dataset or group paired with an
 
     GROUP "view_name" {
         ATTRIBUTE "datatype" = "view{name,mask|entries|slices}"
-        HARDLINK | SOFTLINK | EXTERNALLINK "data" {
-            DATASET | GROUP "name" {
-                ...
-            }
+        HARDLINK | SOFTLINK | EXTERNALLINK "data" -> DATASET | GROUP "name" { ... }
         DATASET "entries" {
-            ATTRIBUTE "datatype" = "array<1>{bool} | array<1>{real} | array<1,1>{real}"
             DATA = [...]
         }
     }
