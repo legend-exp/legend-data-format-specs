@@ -253,14 +253,14 @@ Physical units describing the axes should be, if necessary, attached to the `bin
 
 ## Views
 
-A view is stored as an HDF5 link to another HDF5 dataset or group paired with an index of entries, which may be stored as a mask (array of booleans), entry list (array of integers) or slice list (2/3xn array of integers). The entries are selected by their outer indices (i.e. list of records in a tabular data type without modifying individual records). 
+A view is stored as an HDF5 link to another HDF5 dataset or group paired with an index of entries, which may be stored as anentry list (array of integers) or slice list (nx2/3 array of integers). The entries are selected by their outer indices (i.e. list of records in a tabular data type without modifying individual records). 
 
     GROUP "view_name" {
-        ATTRIBUTE "datatype" = "view{name,mask|entries|slices}"
+        ATTRIBUTE "datatype" = "view{entries|slices}"
         HARDLINK | SOFTLINK | EXTERNALLINK "data" -> DATASET | GROUP "name" { ... }
         DATASET "entries" {
             DATA = [...]
         }
     }
 
-If `entries` is formatted as `mask`, it should have the same length as the dataset or Tablular group pointed to by `data`. If `entries` is formatted as `entries`, it should be a sorted list of non-negative, non-repeating integers with values less than the length of the dataset or Tabular group pointed to by `data`. If `entries` is formatted as `slices`, it should be a sorted list of slices; if 2xn, this will indicate contiguous slices, and if 3xn it will indicate strided slices.
+If `entries` is formatted as `entries`, it should be a sorted list of non-negative, non-repeating integers with values less than the length of the dataset or Tabular group pointed to by `data`. If `entries` is formatted as `slices`, it should be a sorted list of slices; if nx2, this will indicate contiguous slices, and if nx3 it will indicate strided slices.
