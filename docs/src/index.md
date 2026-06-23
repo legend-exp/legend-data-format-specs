@@ -5,7 +5,7 @@
 In the interest of long-term data accessibility and to ensure compliance with [FAIR data principles](https://www.nature.com/articles/sdata201618),
 
 * The number of different file formats should be kept to a reasonable minimum.
-* Only mature, well documented and and widely supported data formats with mature implementations/bindings for multiple programming languages are used.
+* Only mature, well documented and widely supported data formats with mature implementations/bindings for multiple programming languages are used.
 * Custom file formats are, if at all, only used for raw data produced by DAQ systems. As raw data tends to be archived long-term, any custom raw data formats must fulfil the following requirements:
     * A complete formal description of the format exists and is made publicly available under a license that allows for independent third-party implementations.
     * At least verified implementations is made publicly available under an open-source license.
