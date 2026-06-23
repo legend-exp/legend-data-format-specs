@@ -28,6 +28,7 @@ Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2
     | Enum                                                                 | `enum{NAME_1=INT_VAL_1,NAME_2=INT_VAL_2,...}`     |
     | Encoded vector of vectors of different size                          | `array<1>{encoded_array<1>{ELTYPE}}`              |
     | Encoded array of arrays of the same size                             | `array_of_encoded_equalsized_arrays<n,m>{ELTYPE}` |
+    | Histogram                                                            | `histogram<n>{ELTYPE}`                            |
 
 The abstract data model is mapped as follows:
 
@@ -209,7 +210,7 @@ An encoded vector of vectors of unqual sizes is stored as an HDF5 group that con
 A 1-dimensional histogram will be written as
 
     GROUP "hist_1d" {
-        ATTRIBUTE "datatype" = "struct{binning,weights,isdensity}"
+        ATTRIBUTE "datatype" = "histogram<1>{real}"
         GROUP "binning" {
             ATTRIBUTE "datatype" = "struct{axis_1}"
             GROUP "axis_1" {
