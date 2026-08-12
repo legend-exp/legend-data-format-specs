@@ -251,6 +251,19 @@ As an alternative to the range objects mentioned above, a simple 1-dimensional a
 
 Physical units describing the axes should be, if necessary, attached to the `binedges` object of each axis.
 
+## Views
+
+A view is stored as an HDF5 link to another HDF5 dataset or group paired with an index of entries, which may be stored as anentry list (array of integers) or slice list (nx2/3 array of integers). The entries are selected by their outer indices (i.e. list of records in a tabular data type without modifying individual records). 
+
+    GROUP "view_name" {
+        ATTRIBUTE "datatype" = "view{entries|slices}"
+        HARDLINK | SOFTLINK | EXTERNALLINK "data" -> DATASET | GROUP "name" { ... }
+        DATASET "entries" {
+            DATA = [...]
+        }
+    }
+
+If `entries` is formatted as `entries`, it should be a sorted list of non-negative, non-repeating integers with values less than the length of the dataset or Tabular group pointed to by `data`. If `entries` is formatted as `slices`, it should be a sorted list of slices; if nx2, this will indicate contiguous slices, and if nx3 it will indicate strided slices.
 
 ## Detector IDs
 
