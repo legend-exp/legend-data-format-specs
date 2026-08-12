@@ -264,3 +264,7 @@ A view is stored as an HDF5 link to another HDF5 dataset or group paired with an
     }
 
 If `entries` is formatted as `entries`, it should be a sorted list of non-negative, non-repeating integers with values less than the length of the dataset or Tabular group pointed to by `data`. If `entries` is formatted as `slices`, it should be a sorted list of slices; if nx2, this will indicate contiguous slices, and if nx3 it will indicate strided slices.
+
+## Detector IDs
+
+LEGEND detector IDs use datatype `detectorid`. They should be stored using the 32-bit integer encoding specified in [Detector ID encoding](@ref), but may also be stored as strings.
