@@ -41,16 +41,22 @@ formatted as follows:
 where:
 
 * `TIMESTAMP` is a LEGEND-style timestamp `yyymmddThhmmssZ` (in UTC time),
-  also used to label data cycles, specifying the start of validity
-* `DATATYPE` is the data type (`all`, `phy`, `cal`, `lar`, etc.) to which the
-  metadata applies. If omitted, it should default to `all`.
-* `MODE` can be `reset`, `append`, `remove`, `replace`. If omitted and this is
-  the first record in the file, defaults to `reset`, otherwise defaults to
-  `append`.
-* `apply` takes an array of metadata files, to be comined into the main
+  also used to label data cycles, specifying the start of validity.
+* `DATATYPE` is the data type (`phy`, `cal`, `lar`, `fft` etc.) to which the
+  metadata applies. `*` is a wildcard referring to a change that affects all possible datatypes.
+* `MODE` can be `reset`, `append`, `remove`, `replace`.
+* `apply` takes an array of metadata files, to be combined into the main
   metadata object depending on `mode` (see below). In general, the files are
   combined "in cascade" (precedence order first to last) into the final metadata
   object.
+
+!!! note 
+    Defaults for fields are not allowed. An error should be thrown if a field is omitted.
+
+!!! warning 
+    All entries within a file are sorted by their timestamp, from earliest to latest. 
+    A given timestamp can only have one validity entry per category. 
+    Duplicate timestamps are applied in the order (from top to bottom) they appear in the file.
 
 The above example record, if appearing at the top of the validity file,
 translates to:
@@ -66,5 +72,30 @@ Modes:
 * `append`: append (in cascade) files listed in `apply` to the current file
   list.
 * `remove`: remove the file(s) listed in `apply` from the current file list.
-* `replace`: replace, in the current fule list, the first file listed in
+* `replace`: replace, in the current file list, the first file listed in
   `apply` with the second one.
+
+
+Example:
+
+```yaml
+- valid_from: 20230311T235840Z
+  apply:
+    - l200-p03-r000-T%-all-config.yaml
+  category:
+    - all
+  mode: reset
+
+- valid_from: 20230317T211819Z
+  apply:
+    - l200-p03-r001-T%-phy-config.yaml
+  category:
+    - cal
+  mode: append
+```
+
+This validity file defines the following behavior:
+
+At the first timestamp, the active metadata for all categories is initialized from `l200-p03-r000-T%-all-config.yaml`.
+
+At the second timestamp, the metadata for the cal category is updated by performing a deep merge of `l200-p03-r000-T%-all-config.yaml` with `l200-p03-r001-T%-phy-config.yaml`. Metadata for all other categories remains unchanged.
