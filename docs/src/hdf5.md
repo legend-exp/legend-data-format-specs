@@ -205,6 +205,28 @@ An encoded vector of vectors of unequal sizes is stored as an HDF5 group with tw
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
 * `decoded_size`: 1-dimensional dataset that stores the length of each original (decoded) vector
 
+Example of encoded waveform values of unequal lengths, where `encoded_data` is an `array<1>{array<1>{real}}` of bytes.
+
+    GROUP "waveform_values" {
+        ATTRIBUTE "datatype" = "array<1>{encoded_array<1>{real}}"
+        ATTRIBUTE "codec" = "uleb128_zigzag_diff"
+        GROUP "encoded_data" {
+            ATTRIBUTE "datatype" = "array<1>{array<1>{real}}"
+            DATASET "cumulative_length" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [...]
+            }
+            DATASET "flattened_data" {
+                ATTRIBUTE "datatype" = "array<1>{real}"
+                DATA = [...]
+            }
+        }
+        DATASET "decoded_size" {
+            ATTRIBUTE "datatype" = "array<1>{real}"
+            DATA = [1000, 1200, 1000, ...]
+        }
+    }
+
 ## Histograms
 
 A 1-dimensional histogram will be written as
