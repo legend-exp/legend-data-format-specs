@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>HDF5 · LEGEND Data Format Specifications</title><script data-outdated-warner src="../assets/warner.js"></script><link rel="canonical" href="https://legend-exp.github.io/legend-data-format-specs/stable/hdf5/"/><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">LEGEND Data Format Specifications</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li class="is-active"><a class="tocitem" href>HDF5</a><ul class="internal"><li><a class="tocitem" href="#HDF5-datasets,-groups-and-attributes"><span>HDF5 datasets, groups and attributes</span></a></li><li><a class="tocitem" href="#Abstract-data-model-representation"><span>Abstract data model representation</span></a></li><li><a class="tocitem" href="#Examples"><span>Examples</span></a></li></ul></li><li><a class="tocitem" href="../data_compression/">Data Compression</a></li><li><a class="tocitem" href="../daq_data/">DAQ Data</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>HDF5</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>HDF5</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/legend-exp/legend-data-format-specs/blob/main/docs/src/hdf5.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="HDF5-File-Format-[Incomplete]"><a class="docs-heading-anchor" href="#HDF5-File-Format-[Incomplete]">HDF5 File Format [Incomplete]</a><a id="HDF5-File-Format-[Incomplete]-1"></a><a class="docs-heading-anchor-permalink" href="#HDF5-File-Format-[Incomplete]" title="Permalink"></a></h1><p>HDF5 is used as the primary binary data format in LEGEND.</p><p>The following describes a mapping between the abstract data model and HDF5. This specifies the structure of the HDF5 implicitly, but precisely, for any data that conforms to the data model. The mapping purposefully uses only common and basic HDF5 features, to ensure it can be easily and reliably implemented in multiple programming languages.</p><h2 id="HDF5-datasets,-groups-and-attributes"><a class="docs-heading-anchor" href="#HDF5-datasets,-groups-and-attributes">HDF5 datasets, groups and attributes</a><a id="HDF5-datasets,-groups-and-attributes-1"></a><a class="docs-heading-anchor-permalink" href="#HDF5-datasets,-groups-and-attributes" title="Permalink"></a></h2><p>Different data types may be stored as an HDF5 dataset of the same type (e.g. a 2-dimensional dataset may represent a matrix or a vector of same-sized vectors). To make the HDF5 files self-documenting, the HDF5 attribute &quot;datatype&quot; is used to indicate the type semantics of datasets and groups.</p><h2 id="Abstract-data-model-representation"><a class="docs-heading-anchor" href="#Abstract-data-model-representation">Abstract data model representation</a><a id="Abstract-data-model-representation-1"></a><a class="docs-heading-anchor-permalink" href="#Abstract-data-model-representation" title="Permalink"></a></h2><p>The abstract data model is mapped as follows:</p><h3 id="Scalar-values"><a class="docs-heading-anchor" href="#Scalar-values">Scalar values</a><a id="Scalar-values-1"></a><a class="docs-heading-anchor-permalink" href="#Scalar-values" title="Permalink"></a></h3><p>Single scalar values are stored as 0-dimensional datasets</p><p>Attribute &quot;datatype&quot;: &quot;real&quot;, &quot;string&quot;, &quot;symbol&quot;, ...</p><h3 id="Arrays"><a class="docs-heading-anchor" href="#Arrays">Arrays</a><a id="Arrays-1"></a><a class="docs-heading-anchor-permalink" href="#Arrays" title="Permalink"></a></h3><h4 id="Flat-arrays"><a class="docs-heading-anchor" href="#Flat-arrays">Flat arrays</a><a id="Flat-arrays-1"></a><a class="docs-heading-anchor-permalink" href="#Flat-arrays" title="Permalink"></a></h4><p>Flat n-dimension arrays are stored as n-dimensional datasets</p><p>Attribute &quot;datatype&quot;: &quot;array&lt;n&gt;{ELEMENT_TYPE}&quot;</p><h4 id="Fixed-sized-arrays"><a class="docs-heading-anchor" href="#Fixed-sized-arrays">Fixed-sized arrays</a><a id="Fixed-sized-arrays-1"></a><a class="docs-heading-anchor-permalink" href="#Fixed-sized-arrays" title="Permalink"></a></h4><p>...</p><p>Attribute &quot;datatype&quot;: &quot;fixedsize<em>array&lt;n&gt;{ELEMENT</em>TYPE}&quot;</p><h4 id="Arrays-of-arrays-of-same-size"><a class="docs-heading-anchor" href="#Arrays-of-arrays-of-same-size">Arrays of arrays of same size</a><a id="Arrays-of-arrays-of-same-size-1"></a><a class="docs-heading-anchor-permalink" href="#Arrays-of-arrays-of-same-size" title="Permalink"></a></h4><p>Nested arrays of dimensionality n, m are stored as flat n+m dimensional datasets.</p><p>Attribute &quot;datatype&quot;: &quot;array<em>of</em>equalsized<em>arrays&lt;n,m&gt;{ELEMENT</em>TYPE}&quot;</p><h4 id="Vectors-of-vectors-of-different-size"><a class="docs-heading-anchor" href="#Vectors-of-vectors-of-different-size">Vectors of vectors of different size</a><a id="Vectors-of-vectors-of-different-size-1"></a><a class="docs-heading-anchor-permalink" href="#Vectors-of-vectors-of-different-size" title="Permalink"></a></h4><p>A Vector of vectors is stored as a group that contains two datasets:</p><ul><li>A 1-dimensional dataset &quot;flattened_data&quot; that stores the concatenation of all vectors into a single vector.</li><li>A 1-dimensional dataset &quot;cumulative_length&quot; that stores the cumulative sum of the length of all vectors.</li></ul><p>HDF5 Attributes of the group:</p><ul><li>&quot;datatype&quot;: &quot;array&lt;1&gt;{array&lt;1&gt;{ELEMENT_TYPE}}&quot;</li></ul><p>The two datasets in the group also have &quot;datatype&quot; (and possibly &quot;units&quot;) attributes that match their content.</p><h3 id="Structs"><a class="docs-heading-anchor" href="#Structs">Structs</a><a id="Structs-1"></a><a class="docs-heading-anchor-permalink" href="#Structs" title="Permalink"></a></h3><p>Structs are stored as HDF5 groups. Fields that are structs themselves are stored as sub-groups, scalars and arrays as datasets. Groups and datasets in the group are named after the fields of the struct.</p><p>HDF5 Attributes:</p><ul><li>&quot;datatype&quot;: &quot;struct{FIELDNAME<em>1,FIELDNAME</em>2,...}&quot;</li></ul><h3 id="Tables"><a class="docs-heading-anchor" href="#Tables">Tables</a><a id="Tables-1"></a><a class="docs-heading-anchor-permalink" href="#Tables" title="Permalink"></a></h3><p>A Table are stored are group of datasets, each representing a column of the table.</p><p>HDF5 Attributes:</p><ul><li>&quot;datatype&quot;: &quot;table{COLNAME<em>1,COLNAME</em>2,...}&quot;</li></ul><h3 id="Enums"><a class="docs-heading-anchor" href="#Enums">Enums</a><a id="Enums-1"></a><a class="docs-heading-anchor-permalink" href="#Enums" title="Permalink"></a></h3><p>Enum values are stores as integer values, but with the &quot;datatype&quot; attribute: &quot;enum{NAME=INT<em>VALUE,...}&quot;. So a vector of enum values will have a &quot;datatype&quot; attribute like &quot;array&lt;N&gt;{enum{NAME=INT</em>VALUE,...}}&quot;&quot;</p><h3 id="Values-with-physical-units"><a class="docs-heading-anchor" href="#Values-with-physical-units">Values with physical units</a><a id="Values-with-physical-units-1"></a><a class="docs-heading-anchor-permalink" href="#Values-with-physical-units" title="Permalink"></a></h3><p>For values with physical units, the dataset only contains the numerical values. The attribute &quot;units&quot; stores the unit information. The attribute value is the string representation of the common scientific notation for the unit. Unicode must not be used.</p><p>HDF5 Attributes:</p><ul><li>&quot;units&quot;: e.g. &quot;mm&quot;, &quot;ns&quot;, &quot;keV&quot;</li></ul><h2 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h2><p>A table &quot;daqdata&quot; with columns for channel number, unix-time, event type, veto and waveform will be written to an HDF5 file like this:</p><pre><code class="nohighlight hljs">GROUP &quot;daqdata&quot; {
+    ATTRIBUTE &quot;datatype&quot; = &quot;table{ch,unixtime,evttype,veto,waveform}&quot;
+    DATASET &quot;ch&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{real}&quot;
+        DATA = [1, 3, 2, 4, ...]
+    }
+    DATASET &quot;unixtime&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{real}&quot;
+        DATA = [1.44061e+09, 1.44061e+09, ...]
+    }
+    DATASET &quot;evttype&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{enum{evt_undef=0,evt_real=1,evt_pulser=2,evt_mc=3,evt_baseline=4}}&quot;
+        DATA = [1, 2, 1, 1, ...]
+    }
+    DATASET &quot;veto&quot; {
+        DATA = [1, 1, 0, 0, ...]
+        ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{bool}&quot;
+        DATA = [1, 1, 0, 0, ...]
+    }
+    GROUP &quot;waveform&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;table{t0,dt,values}&quot;
+        DATASET &quot;dt&quot; {
+            ATTRIBUTE &quot;datatype&quot;= &quot;array&lt;1&gt;{real}&quot;
+            ATTRIBUTE &quot;units&quot;= &quot;ns&quot;
+            DATA = [10, 10, 10, ...]
+        }
+        DATASET &quot;t0&quot; {
+            ATTRIBUTE &quot;datatype&quot;= &quot;array&lt;1&gt;{real}&quot;
+            ATTRIBUTE &quot;units&quot;= &quot;ns&quot;
+            DATA = [76420, 76420, 76420, ...]
+        }
+        GROUP &quot;values&quot; {
+            ATTRIBUTE &quot;datatype&quot;= &quot;array&lt;1&gt;{array&lt;1&gt;{real}}&quot;
+            DATASET &quot;cumulative_length&quot; {
+                ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{real}&quot;
+                DATA = [1000, 2000, 3000, 4000, ...]
+            }
+            DATASET &quot;flattened_data&quot; {
+                ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{real}&quot;
+                DATA = [14440, 14442, 14441, 14434, ...]
+            }
+        }
+    }
+}</code></pre><p>The actual numeric types of the datasets will be application-dependent.</p><p>A 1-dimensional histogram will be written as</p><pre><code class="nohighlight hljs">GROUP &quot;hist_1d&quot; {
+    ATTRIBUTE &quot;datatype&quot; = &quot;struct{binning,weights,isdensity}&quot;
+    GROUP &quot;binning&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;struct{axis_1}&quot;
+        GROUP &quot;axis_1&quot; {
+            ATTRIBUTE &quot;datatype&quot; = &quot;struct{binedges,closedleft}&quot;
+            GROUP &quot;binedges&quot; {
+                ATTRIBUTE &quot;datatype&quot; = &quot;struct{first,last,step}&quot;
+                DATASET &quot;first&quot; {
+                    ATTRIBUTE &quot;datatype&quot; = &quot;real&quot;
+                    DATA = 0
+                }
+                DATASET &quot;last&quot; {
+                    ATTRIBUTE &quot;datatype&quot; = &quot;real&quot;
+                    DATA = 3000
+                }
+                DATASET &quot;step&quot; {
+                    ATTRIBUTE &quot;datatype&quot; = &quot;real&quot;
+                    DATA = 1
+                }
+            }
+            DATASET &quot;closedleft&quot; {
+                ATTRIBUTE &quot;datatype&quot; = &quot;bool&quot;
+                DATA = 1
+            }
+        }
+    }
+    DATASET &quot;isdensity&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;bool&quot;
+        DATA = 0
+    }
+    DATASET &quot;weights&quot; {
+        ATTRIBUTE &quot;datatype&quot; = &quot;array&lt;1&gt;{real}&quot;
+        DATA = [...]
+    }
+}</code></pre><p>Multi-dimensional histograms will have groups &quot;axis_2&quot;, etc., with a multi-dimensional array as the value of dataset &quot;weights&quot;.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Home</a><a class="docs-footer-nextpage" href="../data_compression/">Data Compression »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.24 on <span class="colophon-date" title="Tuesday 28 March 2023 09:33">Tuesday 28 March 2023</span>. Using Julia version 1.8.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
