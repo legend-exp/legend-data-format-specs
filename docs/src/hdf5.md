@@ -59,10 +59,10 @@ Flat ``n``-dimensional arrays are stored as ``n``-dimensional HDF5 datasets.
 
 #### Array of equal-sized arrays
 
-``n-``dimensional arrays of ``m``-dimensional arrays of the same size are stored as flat ``n+m`` dimensional datasets.
+``n``-dimensional arrays of ``m``-dimensional arrays of the same size are stored as flat ``n+m`` dimensional datasets.
 
     DATASET "waveform_values" {
-        ATTRIBUTE "datatype" = "array<1,1>{real}"
+        ATTRIBUTE "datatype" = "array_of_equalsized_arrays<1,1>{real}"
         DATA = [[13712, 13712, 13683, ..., 15400]
                 [13072, 13072, 12992, ..., 18806]
                 ...
@@ -71,7 +71,7 @@ Flat ``n``-dimensional arrays are stored as ``n``-dimensional HDF5 datasets.
 
 #### Vector of vectors
 
-A vector of vectors of unqual sizes is stored as an HDF5 group that contains two datasets:
+A vector of vectors of unequal sizes is stored as an HDF5 group that contains two datasets:
 
 * A 1-dimensional dataset `flattened_data` that stores the concatenation of all vectors into a single vector.
 * A 1-dimensional dataset `cumulative_length` that stores the cumulative sum of the length of all vectors.
@@ -91,7 +91,7 @@ vector-of-vectors-of-reals, the HDF5 structure is
         }
     }
 
-Vectors-of-vectors may be nested to create vectors-of-vectors-of-vectors and so on. So for a vector-of-vectors-of-vectors, the `datatype` attribute of the HDF5 group will be `array<1>{array<1>{array<1>{real}}}`, and `flattened_data` will iself be a vector-of-vectors HDF5 group with the `datatype` attribute `array<1>{array<1>{real}}`. Deeper nesting is allowed.
+Vectors-of-vectors may be nested to create vectors-of-vectors-of-vectors and so on. So for a vector-of-vectors-of-vectors, the `datatype` attribute of the HDF5 group will be `array<1>{array<1>{array<1>{real}}}`, and `flattened_data` will itself be a vector-of-vectors HDF5 group with the `datatype` attribute `array<1>{array<1>{real}}`. Deeper nesting is allowed.
 
 ### Struct
 
@@ -170,10 +170,10 @@ Specialized structures should exist to represent encoded data. An important appl
 
 ### Encoded [Array of equal-sized arrays](@ref)
 
-An encoded array of equal-sized arrays is stored as an HDF5 group that contains two datasets:
+An encoded array of equal-sized arrays is stored as an HDF5 group with two members:
 
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
-* `decoded_size`: 1-dimensional dataset that stores the lengths of the original (decoded) arrays
+* `decoded_size`: 0-dimensional (i.e. scalar) dataset that stores the common length of the original (decoded) arrays
 
 Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1>{real}}` of bytes.
 
@@ -196,13 +196,14 @@ Example of encoded waveform values, where `encoded_data` is an `array<1>{array<1
             ATTRIBUTE "datatype" = "real"
             DATA = ...
         }
+    }
 
 ### Encoded [Vector of vectors](@ref)
 
-An encoded vector of vectors of unqual sizes is stored as an HDF5 group that contains two datasets:
+An encoded vector of vectors of unequal sizes is stored as an HDF5 group with two members:
 
 * `encoded_data`: the encoded data, for example a [Vector of vectors](@ref). The type of the elements must be unsigned 8-bit integers (i.e. bytes)
-* `decoded_size`: 0-dimensional (i.e. scalar) dataset that stores the length of the original (decoded) arrays
+* `decoded_size`: 1-dimensional dataset that stores the length of each original (decoded) vector
 
 ## Histograms
 
